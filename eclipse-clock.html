@@ -1,1 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eclipse Clock</title>
+  <style>
+    /* Shared Styles */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: "Georgia", serif;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    .clock-container {
+      text-align: center;
+    }
+
+    #time {
+      font-size: 3.5rem;
+      letter-spacing: 3px;
+      font-weight: 400;
+    }
+
+    #phrase {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      opacity: 0.6;
+    }
+
+    button {
+      margin-top: 1rem;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      border: 1px solid currentColor;
+      background: transparent;
+      border-radius: 4px;
+    }
+
+    /* Dark Mode */
+    body.dark {
+      background: #1c1c1c;
+      color: #f2f2f2;
+    }
+
+    /* Light Mode */
+    body.light {
+      background: #f2f2f2;
+      color: #1c1c1c;
+    }
+
+    body.light button {
+      border-color: #1c1c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock-container">
+    <h1 id="time">XII : XLV</h1>
+    <p id="phrase">Time moves quietly.</p>
+    <button id="toggleMode">Toggle Light/Dark</button>
+  </div>
+
+  <script>
+    const timeElement = document.getElementById("time");
+    const phraseElement = document.getElementById("phrase");
+    const toggleButton = document.getElementById("toggleMode");
+
+    const phrases = [
+      "Time moves quietly.",
+      "Evening settles in.",
+      "The hour remains.",
+      "Stillness between moments."
+    ];
+
+    // Roman numeral converter
+    function toRoman(num) {
+      const map = [
+        ["M",1000],["CM",900],["D",500],["CD",400],
+        ["C",100],["XC",90],["L",50],["XL",40],
+        ["X",10],["IX",9],["V",5],["IV",4],["I",1]
+      ];
+      let result = "";
+      for (let [roman, value] of map) {
+        while (num >= value) {
+          result += roman;
+          num -= value;
+        }
+      }
+      return result;
+    }
+
+    // Update time every second
+    function updateTime() {
+      const now = new Date();
+      const hours = toRoman(now.getHours() || 12);
+      const minutes = toRoman(now.getMinutes() || 0);
+      timeElement.textContent = `${hours} : ${minutes || "N"}`;
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    // Update phrases every 6 seconds
+    setInterval(() => {
+      const random = Math.floor(Math.random() * phrases.length);
+      phraseElement.textContent = phrases[random];
+    }, 6000);
+
+    // Toggle light/dark mode
+    toggleButton.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+    });
+
+    // Start in dark mode
+    document.body.classList.add("dark");
+  </script>
+</body>
+</html>
 
