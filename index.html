@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eclipse Clock</title>
   <style>
-    /* Shared Styles */
     body {
       margin: 0;
       height: 100vh;
@@ -13,64 +12,52 @@
       justify-content: center;
       align-items: center;
       font-family: "Georgia", serif;
-      transition: background 0.5s, color 0.5s;
-      background: linear-gradient(145deg, #1c1c1c, #111);
+      background: url('1d38a370-23e8-477b-8b83-2090b0207601.png') no-repeat center center;
+      background-size: cover;
       overflow: hidden;
+      color: #f2f2f2;
+      text-shadow: 0 0 12px rgba(0,0,0,0.8);
     }
 
     .clock-container {
       text-align: center;
       padding: 2rem;
+      background: rgba(0,0,0,0.35);
+      border-radius: 10px;
     }
 
     #time {
       font-size: 3.5rem;
       letter-spacing: 3px;
       font-weight: 400;
-      text-shadow: 0 0 8px rgba(255,255,255,0.15);
-      transition: text-shadow 0.3s;
+      text-shadow: 0 0 12px rgba(255,255,255,0.9);
     }
 
     #phrase {
       margin-top: 0.75rem;
       font-size: 0.9rem;
-      opacity: 0.6;
+      opacity: 0.8;
       transition: opacity 1s ease-in-out;
+      text-shadow: 0 0 8px rgba(0,0,0,0.7);
     }
 
     button {
       margin-top: 1rem;
-      padding: 0.4rem 0.8rem;
+      padding: 0.5rem 1rem;
       font-size: 0.85rem;
       cursor: pointer;
-      border: 1px solid currentColor;
-      background: transparent;
-      border-radius: 4px;
-      transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.2s;
-    }
-
-    button:hover {
-      background: rgba(255,255,255,0.05);
-      transform: scale(1.05);
-    }
-
-    /* Dark Mode */
-    body.dark {
-      background: linear-gradient(145deg, #1c1c1c, #111);
+      border: 1px solid #f2f2f2;
+      background: rgba(0,0,0,0.4);
+      border-radius: 5px;
+      transition: background 0.3s, transform 0.2s;
       color: #f2f2f2;
     }
 
-    /* Light Mode */
-    body.light {
-      background: linear-gradient(145deg, #f2f2f2, #e6e6e6);
-      color: #1c1c1c;
+    button:hover {
+      background: rgba(0,0,0,0.6);
+      transform: scale(1.05);
     }
 
-    body.light button {
-      border-color: #1c1c1c;
-    }
-
-    /* Responsive */
     @media(max-width:600px){
       #time { font-size: 2.5rem; }
       #phrase { font-size: 0.8rem; }
@@ -82,13 +69,13 @@
   <div class="clock-container">
     <h1 id="time">XII : XLV</h1>
     <p id="phrase">Time moves quietly.</p>
-    <button id="toggleMode">Toggle Light/Dark</button>
+    <button id="refreshPhrase">Next Phrase</button>
   </div>
 
   <script>
     const timeElement = document.getElementById("time");
     const phraseElement = document.getElementById("phrase");
-    const toggleButton = document.getElementById("toggleMode");
+    const refreshButton = document.getElementById("refreshPhrase");
 
     const phrases = [
       "Time moves quietly.",
@@ -97,7 +84,6 @@
       "Stillness between moments."
     ];
 
-    // Roman numeral converter
     function toRoman(num) {
       const map = [
         ["M",1000],["CM",900],["D",500],["CD",400],
@@ -114,7 +100,6 @@
       return result;
     }
 
-    // Update time every second
     function updateTime() {
       const now = new Date();
       const hours = toRoman(now.getHours() || 12);
@@ -125,28 +110,18 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // Fade phrases
     let currentPhraseIndex = 0;
     function showNextPhrase() {
       phraseElement.style.opacity = 0;
       setTimeout(() => {
         currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
         phraseElement.textContent = phrases[currentPhraseIndex];
-        phraseElement.style.opacity = 0.6;
+        phraseElement.style.opacity = 0.8;
       }, 1000);
     }
 
     setInterval(showNextPhrase, 6000);
-
-    // Toggle light/dark mode
-    toggleButton.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-      document.body.classList.toggle("light");
-    });
-
-    // Start in dark mode
-    document.body.classList.add("dark");
+    refreshButton.addEventListener("click", showNextPhrase);
   </script>
 </body>
 </html>
-
