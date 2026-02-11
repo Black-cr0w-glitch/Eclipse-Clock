@@ -14,16 +14,21 @@
       align-items: center;
       font-family: "Georgia", serif;
       transition: background 0.5s, color 0.5s;
+      background: linear-gradient(145deg, #1c1c1c, #111);
+      overflow: hidden;
     }
 
     .clock-container {
       text-align: center;
+      padding: 2rem;
     }
 
     #time {
       font-size: 3.5rem;
       letter-spacing: 3px;
       font-weight: 400;
+      text-shadow: 0 0 8px rgba(255,255,255,0.15);
+      transition: text-shadow 0.3s;
     }
 
     #phrase {
@@ -41,23 +46,35 @@
       border: 1px solid currentColor;
       background: transparent;
       border-radius: 4px;
-      transition: background 0.3s, color 0.3s, border-color 0.3s;
+      transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background: rgba(255,255,255,0.05);
+      transform: scale(1.05);
     }
 
     /* Dark Mode */
     body.dark {
-      background: #1c1c1c;
+      background: linear-gradient(145deg, #1c1c1c, #111);
       color: #f2f2f2;
     }
 
     /* Light Mode */
     body.light {
-      background: #f2f2f2;
+      background: linear-gradient(145deg, #f2f2f2, #e6e6e6);
       color: #1c1c1c;
     }
 
     body.light button {
       border-color: #1c1c1c;
+    }
+
+    /* Responsive */
+    @media(max-width:600px){
+      #time { font-size: 2.5rem; }
+      #phrase { font-size: 0.8rem; }
+      button { font-size: 0.75rem; }
     }
   </style>
 </head>
