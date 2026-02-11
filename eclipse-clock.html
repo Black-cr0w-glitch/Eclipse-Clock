@@ -30,6 +30,7 @@
       margin-top: 0.75rem;
       font-size: 0.9rem;
       opacity: 0.6;
+      transition: opacity 1s ease-in-out;
     }
 
     button {
@@ -40,6 +41,7 @@
       border: 1px solid currentColor;
       background: transparent;
       border-radius: 4px;
+      transition: background 0.3s, color 0.3s, border-color 0.3s;
     }
 
     /* Dark Mode */
@@ -106,11 +108,18 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    // Update phrases every 6 seconds
-    setInterval(() => {
-      const random = Math.floor(Math.random() * phrases.length);
-      phraseElement.textContent = phrases[random];
-    }, 6000);
+    // Fade phrases
+    let currentPhraseIndex = 0;
+    function showNextPhrase() {
+      phraseElement.style.opacity = 0;
+      setTimeout(() => {
+        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+        phraseElement.textContent = phrases[currentPhraseIndex];
+        phraseElement.style.opacity = 0.6;
+      }, 1000);
+    }
+
+    setInterval(showNextPhrase, 6000);
 
     // Toggle light/dark mode
     toggleButton.addEventListener("click", () => {
