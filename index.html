@@ -1,143 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eclipse Clock</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Eclipse Clock</title>
 
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: "Georgia", serif;
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
 
-      /* 🔁 BACKGROUND IMAGE (must be in repo) */
-      background: url('1d38a370-23e8-477b-8b83-2090b0207601.png') no-repeat center center;
-      background-size: cover;
+:root {
+  --text-color: rgba(255, 255, 255, 0.85);
+  --bg-overlay: rgba(0, 0, 0, 0.55);
+}
 
-      color: #f2f2f2;
-      overflow: hidden;
-    }
+body.light {
+  --text-color: rgba(20, 20, 20, 0.85);
+  --bg-overlay: rgba(255, 255, 255, 0.55);
+}
 
-    .clock-container {
-      text-align: center;
-      padding: 2rem 2.5rem;
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 12px;
-      backdrop-filter: blur(2px);
-    }
+* {
+  box-sizing: border-box;
+}
 
-    #time {
-      font-size: 3.5rem;
-      letter-spacing: 4px;
-      font-weight: 400;
-      text-shadow:
-        0 0 6px rgba(255,255,255,0.6),
-        0 0 14px rgba(0,0,0,0.9);
-    }
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: 'Cinzel', serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  overflow: hidden;
+}
 
-    #phrase {
-      margin-top: 0.8rem;
-      font-size: 0.9rem;
-      opacity: 0.85;
-      transition: opacity 0.8s ease;
-      text-shadow: 0 0 8px rgba(0,0,0,0.9);
-    }
+/* 🔲 Background image */
+.background {
+  position: fixed;
+  inset: 0;
+  background: url("background.png") center / cover no-repeat;
+  z-index: -3;
+}
 
-    button {
-      margin-top: 1.2rem;
-      padding: 0.45rem 1.1rem;
-      font-size: 0.8rem;
-      cursor: pointer;
-      color: #f2f2f2;
+/* 🌫️ Fog layers */
+.fog {
+  position: fixed;
+  inset: -50%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(255,255,255,0.08), transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06), transparent 65%);
+  animation: fogMove 60s linear infinite;
+  z-index: -2;
+}
 
-      background: rgba(0,0,0,0.45);
-      border: 1px solid rgba(255,255,255,0.6);
-      border-radius: 6px;
+.fog::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background:
+    radial-gradient(circle at 40% 50%, rgba(255,255,255,0.05), transparent 60%),
+    radial-gradient(circle at 60% 30%, rgba(255,255,255,0.04), transparent 65%);
+  animation: fogMoveReverse 90s linear infinite;
+}
 
-      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
-    }
+@keyframes fogMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(20%); }
+}
 
-    button:hover {
-      background: rgba(0,0,0,0.65);
-      transform: scale(1.05);
-      box-shadow: 0 0 10px rgba(255,255,255,0.15);
-    }
+@keyframes fogMoveReverse {
+  from { transform: translateX(0); }
+  to { transform: translateX(-25%); }
+}
 
-    @media (max-width: 600px) {
-      #time {
-        font-size: 2.5rem;
-      }
-      #phrase {
-        font-size: 0.8rem;
-      }
-    }
-  </style>
+/* 🕰️ Clock container */
+.clock-container {
+  position: relative;
+  text-align: center;
+  padding: 3rem 4rem;
+  background: var(--bg-overlay);
+  border-radius: 20px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+}
+
+/* ⏰ Time */
+#time {
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  letter-spacing: 0.15em;
+  color: var(--text-color);
+  text-shadow: 0 0 18px rgba(255,255,255,0.25);
+}
+
+/* 🌓 Toggle */
+.toggle {
+  margin-top: 2rem;
+  cursor: pointer;
+  padding: 0.6rem 1.6rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  background: transparent;
+  color: var(--text-color);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 30px;
+  transition: all 0.4s ease;
+}
+
+.toggle:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* 📱 Mobile adjustments */
+@media (max-width: 600px) {
+  .clock-container {
+    padding: 2rem;
+  }
+}
+</style>
 </head>
 
-<body>
-  <div class="clock-container">
-    <h1 id="time">XII : XLV</h1>
-    <p id="phrase">Time moves quietly.</p>
-    <button id="nextPhrase">Next Phrase</button>
-  </div>
+<body class="dark">
 
-  <script>
-    const timeElement = document.getElementById("time");
-    const phraseElement = document.getElementById("phrase");
-    const nextButton = document.getElementById("nextPhrase");
+<div class="background"></div>
+<div class="fog"></div>
 
-    const phrases = [
-      "Time moves quietly.",
-      "Evening settles in.",
-      "The hour remains.",
-      "Stillness between moments."
-    ];
+<div class="clock-container">
+  <div id="time">00:00</div>
+  <button class="toggle" id="toggleMode">TOGGLE MODE</button>
+</div>
 
-    let phraseIndex = 0;
+<script>
+function updateTime() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById("time").textContent = `${hours}:${minutes}`;
+}
 
-    // Roman numeral converter
-    function toRoman(num) {
-      const map = [
-        ["M",1000],["CM",900],["D",500],["CD",400],
-        ["C",100],["XC",90],["L",50],["XL",40],
-        ["X",10],["IX",9],["V",5],["IV",4],["I",1]
-      ];
-      let result = "";
-      for (let [roman, value] of map) {
-        while (num >= value) {
-          result += roman;
-          num -= value;
-        }
-      }
-      return result;
-    }
+setInterval(updateTime, 1000);
+updateTime();
 
-    // Real-time clock
-    function updateTime() {
-      const now = new Date();
-      const hours = toRoman(now.getHours() || 12);
-      const minutes = toRoman(now.getMinutes());
-      timeElement.textContent = `${hours} : ${minutes || "N"}`;
-    }
+document.getElementById("toggleMode").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+});
+</script>
 
-    setInterval(updateTime, 1000);
-    updateTime();
-
-    // Phrase change (MANUAL ONLY)
-    function nextPhrase() {
-      phraseElement.style.opacity = 0;
-      setTimeout(() => {
-        phraseIndex = (phraseIndex + 1) % phrases.length;
-        phraseElement.textContent = phrases[phraseIndex];
-        phraseElement.style.opacity = 0.85;
-      }, 600);
-    }
-
-    nextButton.addEventListener("click", nextPhrase);
-  </script>
 </body>
 </html>
