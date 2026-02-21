@@ -9,13 +9,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
 
 :root {
-  --text-color: rgba(255, 255, 255, 0.85);
-  --bg-overlay: rgba(0, 0, 0, 0.55);
+  --text-color: rgba(255, 255, 255, 0.9);
+  --panel-bg: rgba(0, 0, 0, 0.55);
 }
 
 body.light {
-  --text-color: rgba(20, 20, 20, 0.85);
-  --bg-overlay: rgba(255, 255, 255, 0.55);
+  --text-color: rgba(20, 20, 20, 0.9);
+  --panel-bg: rgba(255, 255, 255, 0.6);
 }
 
 * {
@@ -33,23 +33,24 @@ body {
   overflow: hidden;
 }
 
-/* 🔲 Background image */
+/* 🖼️ Background image */
 .background {
   position: fixed;
   inset: 0;
-  background: url("background.png") center / cover no-repeat;
+  background: url("./background.png") center / cover no-repeat;
   z-index: -3;
 }
 
-/* 🌫️ Fog layers */
+/* 🌫️ Fog overlay */
 .fog {
   position: fixed;
   inset: -50%;
+  pointer-events: none;
   background:
-    radial-gradient(circle at 30% 40%, rgba(255,255,255,0.08), transparent 60%),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.06), transparent 65%);
-  animation: fogMove 60s linear infinite;
-  z-index: -2;
+    radial-gradient(circle at 20% 40%, rgba(255,255,255,0.12), transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08), transparent 65%);
+  animation: fogMove 70s linear infinite;
+  z-index: -1;
 }
 
 .fog::after {
@@ -57,47 +58,57 @@ body {
   position: absolute;
   inset: -50%;
   background:
-    radial-gradient(circle at 40% 50%, rgba(255,255,255,0.05), transparent 60%),
-    radial-gradient(circle at 60% 30%, rgba(255,255,255,0.04), transparent 65%);
-  animation: fogMoveReverse 90s linear infinite;
+    radial-gradient(circle at 40% 50%, rgba(255,255,255,0.07), transparent 60%),
+    radial-gradient(circle at 60% 30%, rgba(255,255,255,0.06), transparent 65%);
+  animation: fogMoveReverse 110s linear infinite;
 }
 
 @keyframes fogMove {
-  from { transform: translateX(0); }
   to { transform: translateX(20%); }
 }
 
 @keyframes fogMoveReverse {
-  from { transform: translateX(0); }
   to { transform: translateX(-25%); }
 }
 
-/* 🕰️ Clock container */
+/* 🌑 Vignette */
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 40%,
+    rgba(0,0,0,0.6) 100%
+  );
+  z-index: -1;
+}
+
+/* 🕰️ Clock panel */
 .clock-container {
-  position: relative;
   text-align: center;
   padding: 3rem 4rem;
-  background: var(--bg-overlay);
-  border-radius: 20px;
-  backdrop-filter: blur(6px);
-  box-shadow: 0 0 40px rgba(0,0,0,0.6);
+  background: var(--panel-bg);
+  border-radius: 22px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 50px rgba(0,0,0,0.7);
 }
 
 /* ⏰ Time */
 #time {
   font-size: clamp(3rem, 7vw, 5.5rem);
-  letter-spacing: 0.15em;
+  letter-spacing: 0.25em;
   color: var(--text-color);
-  text-shadow: 0 0 18px rgba(255,255,255,0.25);
+  text-shadow: 0 0 20px rgba(255,255,255,0.25);
 }
 
-/* 🌓 Toggle */
+/* 🌗 Toggle button */
 .toggle {
   margin-top: 2rem;
   cursor: pointer;
-  padding: 0.6rem 1.6rem;
-  font-size: 0.9rem;
-  letter-spacing: 0.2em;
+  padding: 0.6rem 1.8rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.25em;
   background: transparent;
   color: var(--text-color);
   border: 1px solid rgba(255,255,255,0.4);
@@ -109,7 +120,7 @@ body {
   background: rgba(255,255,255,0.12);
 }
 
-/* 📱 Mobile adjustments */
+/* 📱 Mobile tweaks */
 @media (max-width: 600px) {
   .clock-container {
     padding: 2rem;
@@ -122,18 +133,25 @@ body {
 
 <div class="background"></div>
 <div class="fog"></div>
+<div class="vignette"></div>
 
 <div class="clock-container">
-  <div id="time">00:00</div>
+  <div id="time">XV : 00</div>
   <button class="toggle" id="toggleMode">TOGGLE MODE</button>
 </div>
 
 <script>
+const romanNumerals = [
+  "XII","I","II","III","IV","V",
+  "VI","VII","VIII","IX","X","XI"
+];
+
 function updateTime() {
   const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  document.getElementById("time").textContent = `${hours}:${minutes}`;
+  const hour = now.getHours() % 12;
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const romanHour = romanNumerals[hour];
+  document.getElementById("time").textContent = `${romanHour} : ${minutes}`;
 }
 
 setInterval(updateTime, 1000);
