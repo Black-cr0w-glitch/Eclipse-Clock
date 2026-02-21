@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eclipse Clock</title>
+
   <style>
     body {
       margin: 0;
@@ -12,70 +13,82 @@
       justify-content: center;
       align-items: center;
       font-family: "Georgia", serif;
+
+      /* 🔁 BACKGROUND IMAGE (must be in repo) */
       background: url('1d38a370-23e8-477b-8b83-2090b0207601.png') no-repeat center center;
       background-size: cover;
-      overflow: hidden;
+
       color: #f2f2f2;
-      text-shadow: 0 0 12px rgba(0,0,0,0.8);
+      overflow: hidden;
     }
 
     .clock-container {
       text-align: center;
-      padding: 2rem;
-      background: rgba(0,0,0,0.35);
-      border-radius: 10px;
+      padding: 2rem 2.5rem;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      backdrop-filter: blur(2px);
     }
 
     #time {
       font-size: 3.5rem;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
       font-weight: 400;
-      text-shadow: 0 0 12px rgba(255,255,255,0.9);
+      text-shadow:
+        0 0 6px rgba(255,255,255,0.6),
+        0 0 14px rgba(0,0,0,0.9);
     }
 
     #phrase {
-      margin-top: 0.75rem;
+      margin-top: 0.8rem;
       font-size: 0.9rem;
-      opacity: 0.8;
-      transition: opacity 1s ease-in-out;
-      text-shadow: 0 0 8px rgba(0,0,0,0.7);
+      opacity: 0.85;
+      transition: opacity 0.8s ease;
+      text-shadow: 0 0 8px rgba(0,0,0,0.9);
     }
 
     button {
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
+      margin-top: 1.2rem;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.8rem;
       cursor: pointer;
-      border: 1px solid #f2f2f2;
-      background: rgba(0,0,0,0.4);
-      border-radius: 5px;
-      transition: background 0.3s, transform 0.2s;
       color: #f2f2f2;
+
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 6px;
+
+      transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
     }
 
     button:hover {
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.65);
       transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(255,255,255,0.15);
     }
 
-    @media(max-width:600px){
-      #time { font-size: 2.5rem; }
-      #phrase { font-size: 0.8rem; }
-      button { font-size: 0.75rem; }
+    @media (max-width: 600px) {
+      #time {
+        font-size: 2.5rem;
+      }
+      #phrase {
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="clock-container">
     <h1 id="time">XII : XLV</h1>
     <p id="phrase">Time moves quietly.</p>
-    <button id="refreshPhrase">Next Phrase</button>
+    <button id="nextPhrase">Next Phrase</button>
   </div>
 
   <script>
     const timeElement = document.getElementById("time");
     const phraseElement = document.getElementById("phrase");
-    const refreshButton = document.getElementById("refreshPhrase");
+    const nextButton = document.getElementById("nextPhrase");
 
     const phrases = [
       "Time moves quietly.",
@@ -84,6 +97,9 @@
       "Stillness between moments."
     ];
 
+    let phraseIndex = 0;
+
+    // Roman numeral converter
     function toRoman(num) {
       const map = [
         ["M",1000],["CM",900],["D",500],["CD",400],
@@ -100,28 +116,28 @@
       return result;
     }
 
+    // Real-time clock
     function updateTime() {
       const now = new Date();
       const hours = toRoman(now.getHours() || 12);
-      const minutes = toRoman(now.getMinutes() || 0);
+      const minutes = toRoman(now.getMinutes());
       timeElement.textContent = `${hours} : ${minutes || "N"}`;
     }
 
     setInterval(updateTime, 1000);
     updateTime();
 
-    let currentPhraseIndex = 0;
-    function showNextPhrase() {
+    // Phrase change (MANUAL ONLY)
+    function nextPhrase() {
       phraseElement.style.opacity = 0;
       setTimeout(() => {
-        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-        phraseElement.textContent = phrases[currentPhraseIndex];
-        phraseElement.style.opacity = 0.8;
-      }, 1000);
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        phraseElement.textContent = phrases[phraseIndex];
+        phraseElement.style.opacity = 0.85;
+      }, 600);
     }
 
-    setInterval(showNextPhrase, 6000);
-    refreshButton.addEventListener("click", showNextPhrase);
+    nextButton.addEventListener("click", nextPhrase);
   </script>
 </body>
 </html>
