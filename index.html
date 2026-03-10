@@ -9,121 +9,134 @@
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
 
 :root {
-  --text-color: rgba(255, 255, 255, 0.9);
-  --panel-bg: rgba(0, 0, 0, 0.55);
+  --text-color: rgba(255,255,255,0.9);
+  --panel-bg: rgba(0,0,0,0.55);
 }
 
 body.light {
-  --text-color: rgba(20, 20, 20, 0.9);
-  --panel-bg: rgba(255, 255, 255, 0.6);
+  --text-color: rgba(20,20,20,0.9);
+  --panel-bg: rgba(255,255,255,0.6);
 }
 
-* {
-  box-sizing: border-box;
+*{
+  box-sizing:border-box;
+  transition: all 0.5s ease;
 }
 
-body {
-  margin: 0;
-  height: 100vh;
-  font-family: 'Cinzel', serif;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  overflow: hidden;
+body{
+  margin:0;
+  height:100vh;
+  font-family:'Cinzel',serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#000;
+  overflow:hidden;
 }
 
-/* 🖼️ Background image */
-.background {
-  position: fixed;
-  inset: 0;
-  background: url("./background.png") center / cover no-repeat;
-  z-index: -3;
+/* Background */
+.background{
+  position:fixed;
+  inset:0;
+  background:url("./background.png") center/cover no-repeat;
+  z-index:-3;
 }
 
-/* 🌫️ Fog overlay */
-.fog {
-  position: fixed;
-  inset: -50%;
-  pointer-events: none;
+/* Fog */
+.fog{
+  position:fixed;
+  inset:-50%;
+  pointer-events:none;
   background:
-    radial-gradient(circle at 20% 40%, rgba(255,255,255,0.12), transparent 60%),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08), transparent 65%);
-  animation: fogMove 70s linear infinite;
-  z-index: -1;
+  radial-gradient(circle at 20% 40%, rgba(255,255,255,0.12), transparent 60%),
+  radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08), transparent 65%);
+  animation:fogMove 70s linear infinite;
 }
 
-.fog::after {
-  content: "";
-  position: absolute;
-  inset: -50%;
+.fog::after{
+  content:"";
+  position:absolute;
+  inset:-50%;
   background:
-    radial-gradient(circle at 40% 50%, rgba(255,255,255,0.07), transparent 60%),
-    radial-gradient(circle at 60% 30%, rgba(255,255,255,0.06), transparent 65%);
-  animation: fogMoveReverse 110s linear infinite;
+  radial-gradient(circle at 40% 50%, rgba(255,255,255,0.07), transparent 60%),
+  radial-gradient(circle at 60% 30%, rgba(255,255,255,0.06), transparent 65%);
+  animation:fogMoveReverse 110s linear infinite;
 }
 
-@keyframes fogMove {
-  to { transform: translateX(20%); }
+@keyframes fogMove{
+  to{ transform:translateX(20%); }
 }
 
-@keyframes fogMoveReverse {
-  to { transform: translateX(-25%); }
+@keyframes fogMoveReverse{
+  to{ transform:translateX(-25%); }
 }
 
-/* 🌑 Vignette */
-.vignette {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    circle at center,
-    transparent 40%,
-    rgba(0,0,0,0.6) 100%
-  );
-  z-index: -1;
+/* Vignette */
+.vignette{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6) 100%);
 }
 
-/* 🕰️ Clock panel */
-.clock-container {
-  text-align: center;
-  padding: 3rem 4rem;
-  background: var(--panel-bg);
-  border-radius: 22px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 0 50px rgba(0,0,0,0.7);
+/* Clock panel */
+.clock-container{
+  text-align:center;
+  padding:3rem 4rem;
+  background:var(--panel-bg);
+  border-radius:22px;
+  backdrop-filter:blur(8px);
+  box-shadow:0 0 50px rgba(0,0,0,0.7);
 }
 
-/* ⏰ Time */
-#time {
-  font-size: clamp(3rem, 7vw, 5.5rem);
-  letter-spacing: 0.25em;
-  color: var(--text-color);
-  text-shadow: 0 0 20px rgba(255,255,255,0.25);
+/* Time */
+#time{
+  font-size:clamp(3rem,7vw,5.5rem);
+  letter-spacing:0.25em;
+  color:var(--text-color);
+  text-shadow:0 0 20px rgba(255,255,255,0.25);
+  animation:glow 6s ease-in-out infinite alternate;
 }
 
-/* 🌗 Toggle button */
-.toggle {
-  margin-top: 2rem;
-  cursor: pointer;
-  padding: 0.6rem 1.8rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.25em;
-  background: transparent;
-  color: var(--text-color);
-  border: 1px solid rgba(255,255,255,0.4);
-  border-radius: 30px;
-  transition: all 0.4s ease;
+/* Glow animation */
+@keyframes glow{
+  from{ text-shadow:0 0 10px rgba(255,255,255,0.2);}
+  to{ text-shadow:0 0 30px rgba(255,255,255,0.6);}
 }
 
-.toggle:hover {
-  background: rgba(255,255,255,0.12);
+/* Date */
+#date{
+  margin-top:10px;
+  font-size:1rem;
+  letter-spacing:0.15em;
+  color:var(--text-color);
+  opacity:0.8;
 }
 
-/* 📱 Mobile tweaks */
-@media (max-width: 600px) {
-  .clock-container {
-    padding: 2rem;
+/* Buttons */
+.controls{
+  margin-top:2rem;
+}
+
+button{
+  cursor:pointer;
+  padding:0.6rem 1.6rem;
+  margin:0 6px;
+  font-size:0.75rem;
+  letter-spacing:0.2em;
+  background:transparent;
+  color:var(--text-color);
+  border:1px solid rgba(255,255,255,0.4);
+  border-radius:30px;
+}
+
+button:hover{
+  background:rgba(255,255,255,0.12);
+}
+
+@media(max-width:600px){
+  .clock-container{
+    padding:2rem;
   }
 }
 </style>
@@ -136,30 +149,64 @@ body {
 <div class="vignette"></div>
 
 <div class="clock-container">
-  <div id="time">XV : 00</div>
-  <button class="toggle" id="toggleMode">TOGGLE MODE</button>
+
+<div id="time"></div>
+<div id="date"></div>
+
+<div class="controls">
+<button id="toggleMode">MODE</button>
+<button id="toggleSeconds">SECONDS</button>
+</div>
+
 </div>
 
 <script>
 const romanNumerals = [
-  "XII","I","II","III","IV","V",
-  "VI","VII","VIII","IX","X","XI"
+"XII","I","II","III","IV","V",
+"VI","VII","VIII","IX","X","XI"
 ];
 
-function updateTime() {
-  const now = new Date();
-  const hour = now.getHours() % 12;
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  const romanHour = romanNumerals[hour];
-  document.getElementById("time").textContent = `${romanHour} : ${minutes}`;
+let showSeconds = false;
+
+function updateTime(){
+
+const now = new Date();
+
+const hour = now.getHours()%12;
+const minutes = String(now.getMinutes()).padStart(2,"0");
+const seconds = String(now.getSeconds()).padStart(2,"0");
+
+const romanHour = romanNumerals[hour];
+
+let timeText = `${romanHour} : ${minutes}`;
+
+if(showSeconds){
+timeText += ` : ${seconds}`;
 }
 
-setInterval(updateTime, 1000);
+document.getElementById("time").textContent = timeText;
+
+const options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+
+document.getElementById("date").textContent =
+now.toLocaleDateString(undefined, options);
+
+}
+
+setInterval(updateTime,1000);
 updateTime();
 
-document.getElementById("toggleMode").addEventListener("click", () => {
-  document.body.classList.toggle("light");
-});
+/* Toggle theme */
+
+document.getElementById("toggleMode").onclick = ()=>{
+document.body.classList.toggle("light");
+};
+
+/* Toggle seconds */
+
+document.getElementById("toggleSeconds").onclick = ()=>{
+showSeconds = !showSeconds;
+};
 </script>
 
 </body>
