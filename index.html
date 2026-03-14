@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Eclipse Clock</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
 
-:root {
+:root{
   --text-color: rgba(255,255,255,0.9);
   --panel-bg: rgba(0,0,0,0.55);
 }
 
-body.light {
+body.light{
   --text-color: rgba(20,20,20,0.9);
   --panel-bg: rgba(255,255,255,0.6);
 }
 
 *{
   box-sizing:border-box;
-  transition: all 0.5s ease;
 }
 
 body{
@@ -34,23 +33,72 @@ body{
   overflow:hidden;
 }
 
-/* Background */
+/* Background image */
+
 .background{
   position:fixed;
   inset:0;
   background:url("./background.png") center/cover no-repeat;
+  z-index:-4;
+}
+
+/* Giant Moon */
+
+.moon{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:520px;
+  height:520px;
+  border-radius:50%;
+
+  background: radial-gradient(
+  circle at 40% 35%,
+  rgba(255,255,255,0.85) 0%,
+  rgba(255,255,255,0.35) 35%,
+  rgba(255,255,255,0.15) 55%,
+  transparent 70%
+  );
+
+  filter:blur(4px);
+  opacity:0.28;
   z-index:-3;
+  pointer-events:none;
+
+  animation:moonPulse 14s ease-in-out infinite;
+}
+
+@keyframes moonPulse{
+
+0%{
+opacity:0.25;
+transform:translate(-50%,-50%) scale(1);
+}
+
+50%{
+opacity:0.35;
+transform:translate(-50%,-50%) scale(1.05);
+}
+
+100%{
+opacity:0.25;
+transform:translate(-50%,-50%) scale(1);
+}
+
 }
 
 /* Fog */
+
 .fog{
   position:fixed;
   inset:-50%;
   pointer-events:none;
   background:
-  radial-gradient(circle at 20% 40%, rgba(255,255,255,0.12), transparent 60%),
-  radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08), transparent 65%);
+    radial-gradient(circle at 20% 40%, rgba(255,255,255,0.12), transparent 60%),
+    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08), transparent 65%);
   animation:fogMove 70s linear infinite;
+  z-index:-2;
 }
 
 .fog::after{
@@ -58,8 +106,8 @@ body{
   position:absolute;
   inset:-50%;
   background:
-  radial-gradient(circle at 40% 50%, rgba(255,255,255,0.07), transparent 60%),
-  radial-gradient(circle at 60% 30%, rgba(255,255,255,0.06), transparent 65%);
+    radial-gradient(circle at 40% 50%, rgba(255,255,255,0.07), transparent 60%),
+    radial-gradient(circle at 60% 30%, rgba(255,255,255,0.06), transparent 65%);
   animation:fogMoveReverse 110s linear infinite;
 }
 
@@ -72,14 +120,21 @@ body{
 }
 
 /* Vignette */
+
 .vignette{
   position:fixed;
   inset:0;
   pointer-events:none;
-  background:radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+  background: radial-gradient(
+  circle at center,
+  transparent 40%,
+  rgba(0,0,0,0.6) 100%
+  );
+  z-index:-1;
 }
 
-/* Clock panel */
+/* Clock Panel */
+
 .clock-container{
   text-align:center;
   padding:3rem 4rem;
@@ -90,123 +145,102 @@ body{
 }
 
 /* Time */
+
 #time{
   font-size:clamp(3rem,7vw,5.5rem);
   letter-spacing:0.25em;
   color:var(--text-color);
   text-shadow:0 0 20px rgba(255,255,255,0.25);
-  animation:glow 6s ease-in-out infinite alternate;
 }
 
-/* Glow animation */
-@keyframes glow{
-  from{ text-shadow:0 0 10px rgba(255,255,255,0.2);}
-  to{ text-shadow:0 0 30px rgba(255,255,255,0.6);}
-}
+/* Toggle Button */
 
-/* Date */
-#date{
-  margin-top:10px;
-  font-size:1rem;
-  letter-spacing:0.15em;
-  color:var(--text-color);
-  opacity:0.8;
-}
-
-/* Buttons */
-.controls{
+.toggle{
   margin-top:2rem;
-}
-
-button{
   cursor:pointer;
-  padding:0.6rem 1.6rem;
-  margin:0 6px;
-  font-size:0.75rem;
-  letter-spacing:0.2em;
+  padding:0.6rem 1.8rem;
+  font-size:0.85rem;
+  letter-spacing:0.25em;
   background:transparent;
   color:var(--text-color);
   border:1px solid rgba(255,255,255,0.4);
   border-radius:30px;
+  transition:all 0.4s ease;
 }
 
-button:hover{
+.toggle:hover{
   background:rgba(255,255,255,0.12);
 }
 
+/* Mobile */
+
 @media(max-width:600px){
-  .clock-container{
-    padding:2rem;
-  }
+
+.clock-container{
+padding:2rem;
 }
+
+.moon{
+width:360px;
+height:360px;
+}
+
+}
+
 </style>
 </head>
 
 <body class="dark">
 
 <div class="background"></div>
+<div class="moon"></div>
 <div class="fog"></div>
 <div class="vignette"></div>
 
 <div class="clock-container">
 
-<div id="time"></div>
-<div id="date"></div>
+<div id="time">XV : 00</div>
 
-<div class="controls">
-<button id="toggleMode">MODE</button>
-<button id="toggleSeconds">SECONDS</button>
-</div>
+<button class="toggle" id="toggleMode">
+TOGGLE MODE
+</button>
 
 </div>
 
 <script>
-const romanNumerals = [
+
+const romanNumerals=[
 "XII","I","II","III","IV","V",
 "VI","VII","VIII","IX","X","XI"
 ];
 
-let showSeconds = false;
-
 function updateTime(){
 
-const now = new Date();
+const now=new Date();
 
-const hour = now.getHours()%12;
-const minutes = String(now.getMinutes()).padStart(2,"0");
-const seconds = String(now.getSeconds()).padStart(2,"0");
+const hour=now.getHours()%12;
 
-const romanHour = romanNumerals[hour];
+const minutes=String(now.getMinutes()).padStart(2,"0");
 
-let timeText = `${romanHour} : ${minutes}`;
+const romanHour=romanNumerals[hour];
 
-if(showSeconds){
-timeText += ` : ${seconds}`;
-}
-
-document.getElementById("time").textContent = timeText;
-
-const options = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-
-document.getElementById("date").textContent =
-now.toLocaleDateString(undefined, options);
+document.getElementById("time").textContent=
+`${romanHour} : ${minutes}`;
 
 }
 
 setInterval(updateTime,1000);
+
 updateTime();
 
-/* Toggle theme */
+document
+.getElementById("toggleMode")
+.addEventListener("click",()=>{
 
-document.getElementById("toggleMode").onclick = ()=>{
 document.body.classList.toggle("light");
-};
 
-/* Toggle seconds */
+});
 
-document.getElementById("toggleSeconds").onclick = ()=>{
-showSeconds = !showSeconds;
-};
 </script>
 
 </body>
