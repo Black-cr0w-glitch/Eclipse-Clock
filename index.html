@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eclipse Clock</title>
+<title>Eclipse Clock V2</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
@@ -20,125 +20,241 @@ body {
     overflow: hidden;
 }
 
-/* 🌑 Giant Moon */
+/* 🌌 Stars */
+.stars {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: 0;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    opacity: 0.7;
+    animation: twinkle 2s infinite alternate;
+}
+
+@keyframes twinkle {
+    from { opacity: 0.2; }
+    to { opacity: 1; }
+}
+
+/* 🌑 Moon */
 .moon {
     position: absolute;
     width: 600px;
     height: 600px;
     background: radial-gradient(circle, #1a1a2e, #000);
     border-radius: 50%;
-    filter: blur(2px);
     opacity: 0.25;
     animation: breathe 6s ease-in-out infinite;
 }
 
-/* Glow ring */
-.moon::after {
-    content: "";
-    position: absolute;
-    width: 110%;
-    height: 110%;
-    top: -5%;
-    left: -5%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.08), transparent);
-}
-
-/* 🌌 Breathing animation */
 @keyframes breathe {
-    0%, 100% {
-        transform: scale(1);
-        opacity: 0.25;
-    }
-    50% {
-        transform: scale(1.05);
-        opacity: 0.35;
-    }
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
-/* Clock container */
-.clock-container {
-    text-align: center;
+/* Layout */
+.container {
+    display: flex;
+    gap: 40px;
     z-index: 2;
 }
 
-/* Time */
-#clock {
-    font-size: 80px;
-    letter-spacing: 5px;
-    text-shadow: 0 0 20px rgba(255,255,255,0.3);
+/* Clock */
+.clock-container {
+    text-align: center;
 }
 
-/* Date */
+#clock {
+    font-size: 70px;
+}
+
 #date {
-    margin-top: 10px;
-    font-size: 18px;
+    font-size: 16px;
     opacity: 0.7;
 }
 
-/* Toggle button */
+/* Buttons */
 button {
-    margin-top: 20px;
-    padding: 8px 15px;
+    margin-top: 10px;
+    padding: 8px 12px;
     border: none;
     background: rgba(255,255,255,0.1);
     color: white;
+    border-radius: 8px;
     cursor: pointer;
-    border-radius: 10px;
-    transition: 0.3s;
 }
 
-button:hover {
-    background: rgba(255,255,255,0.2);
+/* Task panel */
+.tasks {
+    width: 200px;
+}
+
+.tasks input {
+    width: 100%;
+    padding: 5px;
+    margin-top: 10px;
+}
+
+.tasks ul {
+    list-style: none;
+    padding: 0;
+}
+
+.tasks li {
+    margin-top: 5px;
+    font-size: 14px;
+}
+
+/* Timer */
+.timer {
+    text-align: center;
+}
+
+#timerDisplay {
+    font-size: 30px;
+    margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
+<div class="stars" id="stars"></div>
 <div class="moon"></div>
 
-<div class="clock-container">
-    <div id="clock">00:00:00</div>
-    <div id="date">Loading...</div>
-    <button onclick="toggleFormat()">Toggle 12/24h</button>
+<div class="container">
+
+    <!-- Clock -->
+    <div class="clock-container">
+        <div id="clock"></div>
+        <div id="date"></div>
+        <button onclick="toggleFormat()">Toggle 12/24h</button>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer">
+        <h3>Focus</h3>
+        <div id="timerDisplay">25:00</div>
+        <button onclick="startTimer()">Start</button>
+        <button onclick="resetTimer()">Reset</button>
+    </div>
+
+    <!-- Tasks -->
+    <div class="tasks">
+        <h3>Tasks</h3>
+        <input id="taskInput" placeholder="Add task...">
+        <ul id="taskList"></ul>
+    </div>
+
 </div>
 
 <script>
-let is24Hour = true;
+// 🌌 Generate stars
+const starsContainer = document.getElementById("stars");
+for (let i = 0; i < 80; i++) {
+    let star = document.createElement("div");
+    star.className = "star";
+    star.style.top = Math.random() * 100 + "%";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.animationDuration = (Math.random() * 2 + 1) + "s";
+    starsContainer.appendChild(star);
+}
+
+// ⏰ Clock
+let is24Hour = localStorage.getItem("format") === "24";
 
 function updateClock() {
     const now = new Date();
-
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    let seconds = now.getSeconds();
-
+    let h = now.getHours();
+    let m = now.getMinutes();
+    let s = now.getSeconds();
     let ampm = "";
 
     if (!is24Hour) {
-        ampm = hours >= 12 ? " PM" : " AM";
-        hours = hours % 12 || 12;
+        ampm = h >= 12 ? " PM" : " AM";
+        h = h % 12 || 12;
     }
 
-    hours = String(hours).padStart(2, '0');
-    minutes = String(minutes).padStart(2, '0');
-    seconds = String(seconds).padStart(2, '0');
-
     document.getElementById("clock").textContent =
-        `${hours}:${minutes}:${seconds}${ampm}`;
+        `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}${ampm}`;
 
-    const options = { weekday: 'long', day: 'numeric', month: 'long' };
     document.getElementById("date").textContent =
-        now.toLocaleDateString(undefined, options);
+        now.toDateString();
 }
 
 function toggleFormat() {
     is24Hour = !is24Hour;
+    localStorage.setItem("format", is24Hour ? "24" : "12");
 }
 
 setInterval(updateClock, 1000);
 updateClock();
+
+// ⏳ Timer
+let time = 1500;
+let interval;
+
+function startTimer() {
+    clearInterval(interval);
+    interval = setInterval(() => {
+        if (time > 0) time--;
+        updateTimer();
+    }, 1000);
+}
+
+function resetTimer() {
+    clearInterval(interval);
+    time = 1500;
+    updateTimer();
+}
+
+function updateTimer() {
+    let m = Math.floor(time / 60);
+    let s = time % 60;
+    document.getElementById("timerDisplay").textContent =
+        `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+// 📝 Tasks (saved)
+const taskInput = document.getElementById("taskInput");
+const taskList = document.getElementById("taskList");
+
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+function renderTasks() {
+    taskList.innerHTML = "";
+    tasks.forEach((t, i) => {
+        let li = document.createElement("li");
+        li.textContent = t;
+        li.onclick = () => {
+            tasks.splice(i,1);
+            saveTasks();
+        };
+        taskList.appendChild(li);
+    });
+}
+
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    renderTasks();
+}
+
+taskInput.addEventListener("keypress", e => {
+    if (e.key === "Enter" && taskInput.value) {
+        tasks.push(taskInput.value);
+        taskInput.value = "";
+        saveTasks();
+    }
+});
+
+renderTasks();
 </script>
 
 </body>
