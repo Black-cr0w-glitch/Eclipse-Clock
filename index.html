@@ -6,241 +6,139 @@
 <title>Eclipse Clock</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
-:root{
-  --text-color: rgba(255,255,255,0.9);
-  --panel-bg: rgba(0,0,0,0.55);
+body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at center, #0a0a0f, #000000);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Orbitron', sans-serif;
+    color: white;
+    overflow: hidden;
 }
 
-body.light{
-  --text-color: rgba(20,20,20,0.9);
-  --panel-bg: rgba(255,255,255,0.6);
+/* 🌑 Giant Moon */
+.moon {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, #1a1a2e, #000);
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: 0.25;
+    animation: breathe 6s ease-in-out infinite;
 }
 
-*{
-  box-sizing:border-box;
+/* Glow ring */
+.moon::after {
+    content: "";
+    position: absolute;
+    width: 110%;
+    height: 110%;
+    top: -5%;
+    left: -5%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08), transparent);
 }
 
-body{
-  margin:0;
-  height:100vh;
-  font-family:'Cinzel',serif;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#000;
-  overflow:hidden;
+/* 🌌 Breathing animation */
+@keyframes breathe {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.25;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.35;
+    }
 }
 
-/* Background image */
-
-.background{
-  position:fixed;
-  inset:0;
-  background:url("./background.png") center/cover no-repeat;
-  z-index:-4;
-}
-
-/* Giant Moon */
-
-.moon{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:520px;
-  height:520px;
-  border-radius:50%;
-
-  background: radial-gradient(
-  circle at 40% 35%,
-  rgba(255,255,255,0.85) 0%,
-  rgba(255,255,255,0.35) 35%,
-  rgba(255,255,255,0.15) 55%,
-  transparent 70%
-  );
-
-  filter:blur(4px);
-  opacity:0.28;
-  z-index:-3;
-  pointer-events:none;
-
-  animation:moonPulse 14s ease-in-out infinite;
-}
-
-@keyframes moonPulse{
-
-0%{
-opacity:0.25;
-transform:translate(-50%,-50%) scale(1);
-}
-
-50%{
-opacity:0.35;
-transform:translate(-50%,-50%) scale(1.05);
-}
-
-100%{
-opacity:0.25;
-transform:translate(-50%,-50%) scale(1);
-}
-
-}
-
-/* Fog */
-
-.fog{
-  position:fixed;
-  inset:-50%;
-  pointer-events:none;
-  background:
-    radial-gradient(circle at 20% 40%, rgba(255,255,255,0.12), transparent 60%),
-    radial-gradient(circle at 70% 60%, rgba(255,255,255,0.08), transparent 65%);
-  animation:fogMove 70s linear infinite;
-  z-index:-2;
-}
-
-.fog::after{
-  content:"";
-  position:absolute;
-  inset:-50%;
-  background:
-    radial-gradient(circle at 40% 50%, rgba(255,255,255,0.07), transparent 60%),
-    radial-gradient(circle at 60% 30%, rgba(255,255,255,0.06), transparent 65%);
-  animation:fogMoveReverse 110s linear infinite;
-}
-
-@keyframes fogMove{
-  to{ transform:translateX(20%); }
-}
-
-@keyframes fogMoveReverse{
-  to{ transform:translateX(-25%); }
-}
-
-/* Vignette */
-
-.vignette{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background: radial-gradient(
-  circle at center,
-  transparent 40%,
-  rgba(0,0,0,0.6) 100%
-  );
-  z-index:-1;
-}
-
-/* Clock Panel */
-
-.clock-container{
-  text-align:center;
-  padding:3rem 4rem;
-  background:var(--panel-bg);
-  border-radius:22px;
-  backdrop-filter:blur(8px);
-  box-shadow:0 0 50px rgba(0,0,0,0.7);
+/* Clock container */
+.clock-container {
+    text-align: center;
+    z-index: 2;
 }
 
 /* Time */
-
-#time{
-  font-size:clamp(3rem,7vw,5.5rem);
-  letter-spacing:0.25em;
-  color:var(--text-color);
-  text-shadow:0 0 20px rgba(255,255,255,0.25);
+#clock {
+    font-size: 80px;
+    letter-spacing: 5px;
+    text-shadow: 0 0 20px rgba(255,255,255,0.3);
 }
 
-/* Toggle Button */
-
-.toggle{
-  margin-top:2rem;
-  cursor:pointer;
-  padding:0.6rem 1.8rem;
-  font-size:0.85rem;
-  letter-spacing:0.25em;
-  background:transparent;
-  color:var(--text-color);
-  border:1px solid rgba(255,255,255,0.4);
-  border-radius:30px;
-  transition:all 0.4s ease;
+/* Date */
+#date {
+    margin-top: 10px;
+    font-size: 18px;
+    opacity: 0.7;
 }
 
-.toggle:hover{
-  background:rgba(255,255,255,0.12);
+/* Toggle button */
+button {
+    margin-top: 20px;
+    padding: 8px 15px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.3s;
 }
 
-/* Mobile */
-
-@media(max-width:600px){
-
-.clock-container{
-padding:2rem;
+button:hover {
+    background: rgba(255,255,255,0.2);
 }
-
-.moon{
-width:360px;
-height:360px;
-}
-
-}
-
 </style>
 </head>
 
-<body class="dark">
+<body>
 
-<div class="background"></div>
 <div class="moon"></div>
-<div class="fog"></div>
-<div class="vignette"></div>
 
 <div class="clock-container">
-
-<div id="time">XV : 00</div>
-
-<button class="toggle" id="toggleMode">
-TOGGLE MODE
-</button>
-
+    <div id="clock">00:00:00</div>
+    <div id="date">Loading...</div>
+    <button onclick="toggleFormat()">Toggle 12/24h</button>
 </div>
 
 <script>
+let is24Hour = true;
 
-const romanNumerals=[
-"XII","I","II","III","IV","V",
-"VI","VII","VIII","IX","X","XI"
-];
+function updateClock() {
+    const now = new Date();
 
-function updateTime(){
+    let hours = now.getHours();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
 
-const now=new Date();
+    let ampm = "";
 
-const hour=now.getHours()%12;
+    if (!is24Hour) {
+        ampm = hours >= 12 ? " PM" : " AM";
+        hours = hours % 12 || 12;
+    }
 
-const minutes=String(now.getMinutes()).padStart(2,"0");
+    hours = String(hours).padStart(2, '0');
+    minutes = String(minutes).padStart(2, '0');
+    seconds = String(seconds).padStart(2, '0');
 
-const romanHour=romanNumerals[hour];
+    document.getElementById("clock").textContent =
+        `${hours}:${minutes}:${seconds}${ampm}`;
 
-document.getElementById("time").textContent=
-`${romanHour} : ${minutes}`;
-
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
+    document.getElementById("date").textContent =
+        now.toLocaleDateString(undefined, options);
 }
 
-setInterval(updateTime,1000);
+function toggleFormat() {
+    is24Hour = !is24Hour;
+}
 
-updateTime();
-
-document
-.getElementById("toggleMode")
-.addEventListener("click",()=>{
-
-document.body.classList.toggle("light");
-
-});
-
+setInterval(updateClock, 1000);
+updateClock();
 </script>
 
 </body>
