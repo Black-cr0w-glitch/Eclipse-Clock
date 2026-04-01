@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eclipse Clock V2</title>
+<title>Eclipse Clock V3 - Cinematic</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
@@ -18,32 +18,49 @@ body {
     font-family: 'Orbitron', sans-serif;
     color: white;
     overflow: hidden;
+    perspective: 1000px;
 }
 
-/* 🌌 Stars */
+/* Background shift */
+body::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at center, #0a0a0f, #000000);
+    animation: backgroundShift 30s linear infinite;
+    z-index: -2;
+}
+@keyframes backgroundShift {
+    0% { transform: translate(-25%, -25%) scale(1); }
+    50% { transform: translate(0%, 0%) scale(1.02); }
+    100% { transform: translate(-25%, -25%) scale(1); }
+}
+
+/* Stars */
 .stars {
     position: absolute;
     width: 100%;
     height: 100%;
     background: transparent;
-    z-index: 0;
+    z-index: -1;
 }
-
 .star {
     position: absolute;
     width: 2px;
     height: 2px;
     background: white;
+    border-radius: 50%;
     opacity: 0.7;
     animation: twinkle 2s infinite alternate;
 }
-
 @keyframes twinkle {
-    from { opacity: 0.2; }
-    to { opacity: 1; }
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
 }
 
-/* 🌑 Moon */
+/* Moon */
 .moon {
     position: absolute;
     width: 600px;
@@ -51,36 +68,52 @@ body {
     background: radial-gradient(circle, #1a1a2e, #000);
     border-radius: 50%;
     opacity: 0.25;
-    animation: breathe 6s ease-in-out infinite;
+    transition: transform 0.1s ease-out;
 }
 
-@keyframes breathe {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-/* Layout */
+/* Container */
 .container {
     display: flex;
     gap: 40px;
     z-index: 2;
+    transform-style: preserve-3d;
 }
 
 /* Clock */
 .clock-container {
     text-align: center;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out;
 }
-
 #clock {
     font-size: 70px;
+    letter-spacing: 4px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    text-shadow: 0 0 15px rgba(255,255,255,0.25);
 }
-
+.clock-glow {
+    animation: glowPulse 1s ease;
+}
+@keyframes glowPulse {
+    0% { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+    50% { text-shadow: 0 0 25px rgba(255,255,255,0.5); }
+    100% { text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+}
 #date {
-    font-size: 16px;
-    opacity: 0.7;
+    margin-top: 8px;
+    font-size: 15px;
+    opacity: 0.6;
+    letter-spacing: 1px;
 }
 
-/* Buttons */
+/* Timer */
+.timer {
+    text-align: center;
+}
+#timerDisplay {
+    font-size: 30px;
+    margin-top: 10px;
+}
 button {
     margin-top: 10px;
     padding: 8px 12px;
@@ -91,35 +124,34 @@ button {
     cursor: pointer;
 }
 
-/* Task panel */
+/* Tasks */
 .tasks {
     width: 200px;
 }
-
 .tasks input {
     width: 100%;
     padding: 5px;
     margin-top: 10px;
 }
-
 .tasks ul {
     list-style: none;
     padding: 0;
 }
-
 .tasks li {
     margin-top: 5px;
     font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
 }
 
-/* Timer */
-.timer {
-    text-align: center;
+/* Focus mode */
+.focus-mode .clock-container,
+.focus-mode .tasks {
+    display: none;
 }
-
-#timerDisplay {
-    font-size: 30px;
-    margin-top: 10px;
+.focus-mode .timer {
+    transform: scale(1.5);
 }
 </style>
 </head>
@@ -130,7 +162,6 @@ button {
 <div class="moon"></div>
 
 <div class="container">
-
     <!-- Clock -->
     <div class="clock-container">
         <div id="clock"></div>
@@ -144,6 +175,8 @@ button {
         <div id="timerDisplay">25:00</div>
         <button onclick="startTimer()">Start</button>
         <button onclick="resetTimer()">Reset</button>
+        <button onclick="toggleFocusMode()">Focus Mode</button>
+        <div id="sessionCount">Sessions: 0</div>
     </div>
 
     <!-- Tasks -->
@@ -152,7 +185,6 @@ button {
         <input id="taskInput" placeholder="Add task...">
         <ul id="taskList"></ul>
     </div>
-
 </div>
 
 <script>
@@ -169,93 +201,100 @@ for (let i = 0; i < 80; i++) {
 
 // ⏰ Clock
 let is24Hour = localStorage.getItem("format") === "24";
-
 function updateClock() {
     const now = new Date();
     let h = now.getHours();
     let m = now.getMinutes();
     let s = now.getSeconds();
     let ampm = "";
-
     if (!is24Hour) {
         ampm = h >= 12 ? " PM" : " AM";
         h = h % 12 || 12;
     }
 
-    document.getElementById("clock").textContent =
-        `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}${ampm}`;
+    const newTime = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}${ampm}`;
 
-    document.getElementById("date").textContent =
-        now.toDateString();
+    const clockEl = document.getElementById("clock");
+    clockEl.style.opacity = 0;
+    clockEl.style.transform = "translateY(5px)";
+    setTimeout(() => {
+        clockEl.textContent = newTime;
+        clockEl.style.opacity = 1;
+        clockEl.style.transform = "translateY(0)";
+        clockEl.classList.add("clock-glow");
+        setTimeout(() => clockEl.classList.remove("clock-glow"), 300);
+    }, 150);
+
+    document.getElementById("date").textContent = now.toDateString();
 }
-
 function toggleFormat() {
     is24Hour = !is24Hour;
     localStorage.setItem("format", is24Hour ? "24" : "12");
 }
-
 setInterval(updateClock, 1000);
 updateClock();
 
-// ⏳ Timer
+// 🔒 Focus Mode
+function toggleFocusMode() {
+    document.body.classList.toggle("focus-mode");
+}
+
+// ⏳ Timer + Session Counter
 let time = 1500;
 let interval;
+let sessions = localStorage.getItem("sessions") || 0;
+document.getElementById("sessionCount").textContent = "Sessions: " + sessions;
 
 function startTimer() {
     clearInterval(interval);
     interval = setInterval(() => {
         if (time > 0) time--;
+        else {
+            clearInterval(interval);
+            sessions++;
+            localStorage.setItem("sessions", sessions);
+            document.getElementById("sessionCount").textContent = "Sessions: " + sessions;
+            alert("Focus session complete 🔥");
+            time = 1500; updateTimer();
+        }
         updateTimer();
     }, 1000);
 }
 
-function resetTimer() {
-    clearInterval(interval);
-    time = 1500;
-    updateTimer();
-}
-
+function resetTimer() { clearInterval(interval); time = 1500; updateTimer(); }
 function updateTimer() {
-    let m = Math.floor(time / 60);
-    let s = time % 60;
-    document.getElementById("timerDisplay").textContent =
-        `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    let m = Math.floor(time / 60), s = time % 60;
+    document.getElementById("timerDisplay").textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-// 📝 Tasks (saved)
+// 📝 Tasks
 const taskInput = document.getElementById("taskInput");
 const taskList = document.getElementById("taskList");
-
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-
 function renderTasks() {
     taskList.innerHTML = "";
-    tasks.forEach((t, i) => {
+    tasks.forEach((t,i)=>{
         let li = document.createElement("li");
         li.textContent = t;
         li.onclick = () => {
-            tasks.splice(i,1);
-            saveTasks();
+            li.style.opacity = "0"; li.style.transform="translateX(20px)";
+            li.style.transition = "0.3s";
+            setTimeout(()=>{tasks.splice(i,1); saveTasks();},300);
         };
         taskList.appendChild(li);
     });
 }
-
-function saveTasks() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    renderTasks();
-}
-
-taskInput.addEventListener("keypress", e => {
-    if (e.key === "Enter" && taskInput.value) {
-        tasks.push(taskInput.value);
-        taskInput.value = "";
-        saveTasks();
-    }
-});
-
+function saveTasks() { localStorage.setItem("tasks", JSON.stringify(tasks)); renderTasks(); }
+taskInput.addEventListener("keypress", e=>{ if(e.key==="Enter" && taskInput.value){ tasks.push(taskInput.value); taskInput.value=""; saveTasks(); }});
 renderTasks();
-</script>
 
+// 🎬 Cinematic Parallax
+document.addEventListener("mousemove", e => {
+    const x = (e.clientX/window.innerWidth-0.5)*20;
+    const y = (e.clientY/window.innerHeight-0.5)*20;
+    document.querySelector(".moon").style.transform = `translate(${x}px,${y}px) scale(1.05)`;
+    document.querySelector(".clock-container").style.transform = `translate(${x/2}px,${y/2}px)`;
+});
+</script>
 </body>
 </html>
